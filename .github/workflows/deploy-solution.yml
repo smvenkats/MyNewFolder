@@ -1,0 +1,26 @@
+name: Deploy ContosoUnvDevDemoSln
+ 
+on:
+  workflow_run:
+    workflows: ["Pack ContosoUnvDevDemoSln"]
+    branches: [main]
+    types:
+      - completed
+  workflow_dispatch:
+ 
+jobs:
+  deploy:
+    runs-on: windows-latest
+    environment: Production
+    steps:
+      - uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: pack-solution.yml
+          name: packed-solution
+      - uses: microsoft/powerplatform-actions/import-solution@v0
+        with:
+          environment-url: https://orgb327024b.crm3.dynamics.com/
+          user-name: ${{ secrets.USERNAME }}
+          password-secret: ${{ secrets.PASSWORD }}
+          solution-file: ContosoUnvDevDemoSln.zip
+ 
